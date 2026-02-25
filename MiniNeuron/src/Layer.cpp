@@ -46,4 +46,23 @@ namespace MiniNeuron {
 		std::cout << "printed weights" << std::endl;
 	}
 
+	std::vector<float> Layer::Forward(std::vector<float>& input) {
+
+		if (weights[0].size() != input.size()) {
+			std::cout << "Invalid input in matrix multiplication " << std::endl;
+			std::invalid_argument;
+		}
+
+		result.resize(NeuronCount, 0.0f);
+
+		for (size_t i = 0; i < NeuronCount; i++) {
+			for (size_t j = 0; j < InputCount; j++) {
+				result[i] += input[j] * weights[i][j];
+			}
+			result[i] += bias[i];
+		}
+
+		return(result);
+
+	}
 }

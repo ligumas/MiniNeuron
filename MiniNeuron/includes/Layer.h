@@ -12,6 +12,7 @@ namespace MiniNeuron {
 		void printWeights();
 
 		std::vector<float> Forward(std::vector<float>& Input);
+		std::vector<float> result;
 
 	private:
 		std::vector<std::vector<float>> weights;
