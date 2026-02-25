@@ -17,8 +17,11 @@ namespace MiniNeuron {
 		float random_num = dis(gen);
 
 		weights.resize(NeuronCount, std::vector<float>(InputCount, 0.0f));
+		bias.resize(NeuronCount, 1);
 		             
 		for(size_t i = 0; i < weights.size(); i++) {
+			random_num = dis(gen);
+			bias[i] = random_num;
 			for (size_t j = 0; j < weights[i].size(); j++)
 			{
 				random_num = dis(gen);
@@ -29,11 +32,15 @@ namespace MiniNeuron {
 	}
 
 	void Layer::printWeights() {
+		std::cout << "Weights:" << "                                 bias:" << std::endl;
 		for (size_t i = 0; i < weights.size(); i++)
 		{
 			for (size_t j = 0; j < weights[i].size(); j++) {
 				std::cout << weights[i][j] << ", ";
 			}
+
+			std::cout << "       " << bias[i];
+
 			std::cout << std::endl;
 		}
 		std::cout << "printed weights" << std::endl;

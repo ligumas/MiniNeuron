@@ -11,6 +11,8 @@ namespace MiniNeuron {
 		void initWeights();
 		void printWeights();
 
+		std::vector<float> Forward(std::vector<float>& Input);
+
 	private:
 		std::vector<std::vector<float>> weights;
 		std::vector<float> bias;
