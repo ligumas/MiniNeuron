@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\initializers.h" />
     <ClInclude Include="includes\Layer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\initializers.cpp" />
     <ClCompile Include="src\Layer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
