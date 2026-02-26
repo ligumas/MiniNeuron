@@ -1,12 +1,13 @@
 #pragma once
 #include <vector>
+#include "activation_types.h"
 
 namespace MiniNeuron {
 
 	class Layer
 	{
 	public:
-		Layer(size_t InputCount, size_t NeuronCount);
+		Layer(size_t InputCount, size_t NeuronCount, ActivationType activation);
 
 		void initWeights();
 		void printWeights();
@@ -18,6 +19,9 @@ namespace MiniNeuron {
 		size_t InputCount;
 
 	private:
+
+		ActivationType activation = ActivationType::Linear;
+
 		std::vector<std::vector<float>> weights;
 		std::vector<float> bias;
 	};

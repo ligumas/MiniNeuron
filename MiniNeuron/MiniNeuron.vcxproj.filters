@@ -35,5 +35,8 @@
     <ClInclude Include="includes\network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\activation_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

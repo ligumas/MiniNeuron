@@ -1,5 +1,6 @@
 #include "Layer.h"
 #include "network.h"
+#include "activation_types.h"
 #include <iostream>
 #include <vector>
 
@@ -18,9 +19,9 @@ int main() {
 	*/
 
 	MiniNeuron::network test_network;
-	test_network.add(MiniNeuron::Layer(764, 400));
-	test_network.add(MiniNeuron::Layer(400, 300));
-	test_network.add(MiniNeuron::Layer(300, 10));
+	test_network.add(MiniNeuron::Layer(784, 256, ActivationType::ReLU));
+	test_network.add(MiniNeuron::Layer(256, 128, ActivationType::ReLU));
+	test_network.add(MiniNeuron::Layer(128, 10, ActivationType::Softmax));
 
 	test_network.initlayers();
 
