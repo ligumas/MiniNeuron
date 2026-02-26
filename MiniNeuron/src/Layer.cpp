@@ -50,7 +50,10 @@ namespace MiniNeuron {
 			for (size_t j = 0; j < InputCount; j++) {
 				result[i] += input[j] * weights[i][j];
 			}
+			//linear output
 			result[i] += bias[i];
+			//ReLU move to own system later
+			result[i] = std::max(0.0f, result[i]);
 		}
 
 		return(result);

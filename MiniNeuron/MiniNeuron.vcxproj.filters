@@ -21,12 +21,18 @@
     <ClCompile Include="src\initializers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes\initializers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

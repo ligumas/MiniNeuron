@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\network.h" />
     <ClInclude Include="includes\initializers.h" />
     <ClInclude Include="includes\Layer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\initializers.cpp" />
     <ClCompile Include="src\Layer.cpp" />
+    <ClCompile Include="src\network.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
