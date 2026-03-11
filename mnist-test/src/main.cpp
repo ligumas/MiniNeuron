@@ -1,31 +1,43 @@
 #include "Layer.h"
 #include "network.h"
 #include "activation_types.h"
+#include "loss_types.h"
 #include <iostream>
 #include <vector>
 
 int main() {
+    MiniNeuron::network net;
 
-	/*
-	MiniNeuron::Layer testLayer(4, 3);
-	std::vector<float> input = { 1.0, 1.0, 1.0 };
-	testLayer.initWeights();
-	testLayer.printWeights();
-	std::vector<float> ans = testLayer.Forward(input);
-	std::cout << "results:" << std::endl;
-	for (int i = 0; i < ans.size(); i++) {
-		std::cout << ans[i] << ", ";
-	}
-	*/
+    // 2 Inputs -> 4 Hidden Neurons -> 1 Output Neuron
+    net.add(MiniNeuron::Layer(4, 2, ActivationType::ReLU));
+    net.add(MiniNeuron::Layer(1, 4, ActivationType::Linear)); // Output layer (size 1)
 
-	MiniNeuron::network test_network;
-	test_network.add(MiniNeuron::Layer(784, 256, ActivationType::ReLU));
-	test_network.add(MiniNeuron::Layer(256, 128, ActivationType::ReLU));
-	test_network.add(MiniNeuron::Layer(128, 10, ActivationType::Softmax));
+    net.initlayers();
 
-	test_network.initlayers();
+    // XOR Data: {Input1, Input2} -> {Target}
+    std::vector<std::vector<float>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
+    std::vector<std::vector<float>> targets = { {0}, {1}, {1}, {0} };
 
-	test_network.printNetwork();
+    float learning_rate = 0.005f;
 
-	return 0;
+    std::cout << "Starting Training..." << std::endl;
+
+    for (int epoch = 0; epoch < 500000; epoch++) {
+        float total_loss = 0;
+
+        net.epoch(inputs, targets, learning_rate);
+
+        if (epoch % 500 == 0) {
+            std::cout << "Epoch " << epoch << " - Avg Loss: " << total_loss / 4.0f << std::endl;
+        }
+    }
+
+    std::cout << "\nFinal Testing:" << std::endl;
+    for (auto& test_in : inputs) {
+        std::vector<float> res = net.forward(test_in);
+        std::cout << "In: " << test_in[0] << "," << test_in[1]
+            << " Predicted: " << std::round(res[0]) << std::endl;
+    }
+
+    return 0;
 }

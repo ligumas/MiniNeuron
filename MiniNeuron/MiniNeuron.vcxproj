@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\activation_types.h" />
+    <ClInclude Include="includes\loss_types.h" />
     <ClInclude Include="includes\network.h" />
     <ClInclude Include="includes\initializers.h" />
     <ClInclude Include="includes\Layer.h" />
