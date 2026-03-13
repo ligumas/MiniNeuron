@@ -114,4 +114,28 @@ namespace MiniNeuron {
 		return total_loss / inputs.size();
 	}
 
+	void network::train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int epochs, float learning_rate) {
+		std::cout << "Starting Training..." << std::endl;
+
+		
+
+		for (int i = 0; i < epochs; i++) {
+			float total_loss = 0;
+			float loss = 0;
+
+			loss = epoch(inputs, targets, learning_rate);
+			total_loss += loss;
+
+			if (i % 500 == 0) {
+				std::cout.precision(8);
+				std::cout << std::fixed;
+				std::cout << "Epoch: " << i
+					<< " | Loss: " << loss
+					<< " | Avg Loss: " << total_loss / 4.0f
+					<< std::endl;
+			}
+			std::cout.unsetf(std::ios::fixed);
+		}
+	}
+
 }

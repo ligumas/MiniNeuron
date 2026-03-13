@@ -20,6 +20,7 @@ namespace MiniNeuron {
 		void backpropagate(const std::vector<float>& targets);
 		void update_network(const std::vector<float>& og_inputs, float learningRate);
 		float epoch(const std::vector<std::vector<float>>& input, const std::vector<std::vector<float>>& target, float learning_rate);
+		void train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets, int epochs, float learning_rate);
 
 	private:
 		

@@ -18,19 +18,9 @@ int main() {
     std::vector<std::vector<float>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
     std::vector<std::vector<float>> targets = { {0}, {1}, {1}, {0} };
 
-    float learning_rate = 0.005f;
+    float learning_rate = 0.0005f;
 
-    std::cout << "Starting Training..." << std::endl;
-
-    for (int epoch = 0; epoch < 500000; epoch++) {
-        float total_loss = 0;
-
-        net.epoch(inputs, targets, learning_rate);
-
-        if (epoch % 500 == 0) {
-            std::cout << "Epoch " << epoch << " - Avg Loss: " << total_loss / 4.0f << std::endl;
-        }
-    }
+    net.train(inputs, targets, 50000, learning_rate);
 
     std::cout << "\nFinal Testing:" << std::endl;
     for (auto& test_in : inputs) {
