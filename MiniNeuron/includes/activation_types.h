@@ -3,5 +3,6 @@
 enum class ActivationType {
 	Linear,
 	ReLU,
+	Sigmoid,
 	Softmax
 };
