@@ -126,7 +126,7 @@ namespace MiniNeuron {
 			loss = epoch(inputs, targets, learning_rate);
 			total_loss += loss;
 
-			if (i % 500 == 0) {
+			if (i % 10 == 0) {
 				std::cout.precision(8);
 				std::cout << std::fixed;
 				std::cout << "Epoch: " << i

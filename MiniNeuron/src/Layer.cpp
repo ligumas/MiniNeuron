@@ -2,6 +2,7 @@
 #include "initializers.h"
 #include "activation_types.h"
 #include <iostream>
+#include <cmath>
 
 namespace MiniNeuron {
 
@@ -65,10 +66,12 @@ namespace MiniNeuron {
 		//switch case to choose the activasion method
 		switch (activation) {
 			case ActivationType::ReLU:
+			{
 				for(size_t i = 0; i < NeuronCount; i++) {
 					result[i] = std::max(0.0f, result[i]);
 				}
 				break;
+			}
 			case ActivationType::Softmax:
 			{
 				float max_val = result[0];
@@ -89,6 +92,13 @@ namespace MiniNeuron {
 				}
 				break;
 			}
+			case ActivationType::Sigmoid:
+			{
+				for (size_t i = 0; i < NeuronCount; i++) {
+					result[i] = 1.0f / (1.0f + std::exp(-result[i]));
+				}
+				break;
+			}
 			default:
 				//default to linear
 				break;
@@ -105,6 +115,11 @@ namespace MiniNeuron {
 			case ActivationType::Softmax:
 			{
 				return 1.0f;
+			}
+			case ActivationType::Sigmoid:
+			{
+				float s = 1.0f / (1.0f + std::expf(-val));
+				return s * (1.0f - s);
 			}
 			default:
 				return 1.0f; // linear
