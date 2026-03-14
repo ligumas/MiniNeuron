@@ -9,8 +9,8 @@ int main() {
     MiniNeuron::network net;
 
     // 2 Inputs -> 4 Hidden Neurons -> 1 Output Neuron
-    net.add(MiniNeuron::Layer(4, 2, ActivationType::ReLU));
-    net.add(MiniNeuron::Layer(1, 4, ActivationType::Linear)); // Output layer (size 1)
+    net.add(MiniNeuron::Layer(4, 2, ActivationType::ReLU, InitializerType::Xavier));
+    net.add(MiniNeuron::Layer(1, 4, ActivationType::Linear, InitializerType::Xavier)); // Output layer (size 1)
 
     net.initlayers();
 
@@ -20,7 +20,7 @@ int main() {
 
     float learning_rate = 0.0005f;
 
-    net.train(inputs, targets, 50000, learning_rate);
+    net.train(inputs, targets, 500, learning_rate);
 
     std::cout << "\nFinal Testing:" << std::endl;
     for (auto& test_in : inputs) {
