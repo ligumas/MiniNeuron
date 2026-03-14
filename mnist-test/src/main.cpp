@@ -20,7 +20,7 @@ int main() {
 
     float learning_rate = 0.5f;
 
-    net.train(inputs, targets, 1000, learning_rate);
+    net.train(inputs, targets, 500, learning_rate);
 
     std::cout << "\nFinal Testing:" << std::endl;
     for (auto& test_in : inputs) {

@@ -6,10 +6,11 @@
 
 namespace MiniNeuron {
 
-	Layer::Layer(size_t NeuronCount, size_t InputCount, ActivationType activation) {
+	Layer::Layer(size_t NeuronCount, size_t InputCount, ActivationType activation, InitializerType initializer) {
 		this->NeuronCount = NeuronCount;
 		this->InputCount =  InputCount;
 		this->activation = activation;
+		this->initializer = initializer;
 	}
 
 	void Layer::initWeights() {
@@ -22,7 +23,18 @@ namespace MiniNeuron {
 		for(size_t i = 0; i < weights.size(); i++) {
 			for (size_t j = 0; j < weights[i].size(); j++)
 			{
-				weights[i][j] = HeInit(InputCount);
+				switch (initializer) {
+					case InitializerType::HeInit:
+					{
+						weights[i][j] = HeInit(InputCount);
+						break;
+					}
+					case InitializerType::Xavier:
+					{
+						weights[i][j] = Xavier(InputCount, NeuronCount);
+						break;
+					}
+				}
 				//weights[i][j] = ((float)rand() / (float)RAND_MAX) * 0.2f - 0.1f;
 			}
 		}
