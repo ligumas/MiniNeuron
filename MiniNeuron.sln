@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniNeuron", "MiniNeuron\MiniNeuron.vcxproj", "{6F4F7E92-419A-40B9-88B4-4E32B097D35C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mnist-test", "mnist-test\mnist-test.vcxproj", "{408E5A41-3C7D-4A5A-B523-5D3EB05C9DD6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mnist-test", "demos\mnist\mnist-test.vcxproj", "{408E5A41-3C7D-4A5A-B523-5D3EB05C9DD6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xor-demo", "demos\xor-demo\xor-demo.vcxproj", "{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{408E5A41-3C7D-4A5A-B523-5D3EB05C9DD6}.Release|x64.Build.0 = Release|x64
 		{408E5A41-3C7D-4A5A-B523-5D3EB05C9DD6}.Release|x86.ActiveCfg = Release|Win32
 		{408E5A41-3C7D-4A5A-B523-5D3EB05C9DD6}.Release|x86.Build.0 = Release|Win32
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Debug|x64.ActiveCfg = Debug|x64
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Debug|x64.Build.0 = Debug|x64
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Debug|x86.ActiveCfg = Debug|Win32
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Debug|x86.Build.0 = Debug|Win32
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Release|x64.ActiveCfg = Release|x64
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Release|x64.Build.0 = Release|x64
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Release|x86.ActiveCfg = Release|Win32
+		{51E7B4B5-AEE5-4855-B6CB-1D89EF167E91}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
