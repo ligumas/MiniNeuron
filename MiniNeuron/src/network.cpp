@@ -98,7 +98,7 @@ namespace MiniNeuron {
 		}
 	}
 
-	float Network::epoch(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets, float learningRate) {
+	float Network::epoch(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets, float learningRate, LossTypes losstype) {
 		float total_loss = 0.0f;
 		assert(inputs.size() == targets.size());
 		for (size_t i = 0; i < inputs.size(); i++)
@@ -107,17 +107,17 @@ namespace MiniNeuron {
 			const std::vector<float>& y = targets[i];
 
 			std::vector<float> prediction = forward(x);
-			total_loss += loss(prediction, y, LossTypes::MSE);
+			total_loss += loss(prediction, y, LossTypes::crossEntropy);
 			backpropagate(y);
 			updateNetwork(x, learningRate);
 		}
 		return total_loss / inputs.size();
 	}
 
-	void Network::train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int epochs, float learningRate) {
+	void Network::train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int epochs, float learningRate, LossTypes losstype) {
 		std::cout << "Starting Training..." << std::endl;
 		for (int i = 0; i < epochs; i++) {
-			float avgLoss = epoch(inputs, targets, learningRate);
+			float avgLoss = epoch(inputs, targets, learningRate, losstype);
 			if (i % 100 == 0) {
 				std::cout.precision(8);
 				std::cout << std::fixed;

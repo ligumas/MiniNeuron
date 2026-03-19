@@ -2,7 +2,7 @@
 #include "network.h"
 #include "activation_types.h"
 #include "loss_types.h"
-
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -21,12 +21,13 @@ int main() {
     std::vector<std::vector<float>> inputs = { {0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 1.0f} };
     std::vector<std::vector<float>> targets = { {0.0f}, {1.0f}, {1.0f}, {0.0f} };
 
-	float learningRate = 0.1f;
+	float learningRate = 5.0f;
 
 	//train function, 5000 epochs.
-	net.train(inputs, targets, 5000, learningRate);
+	net.train(inputs, targets, 500, learningRate, LossTypes::crossEntropy);
 
 	//print prediction for all inputs to check final perfomance
+	std::cout << std::fixed << std::setprecision(2);
 	for (int i = 0; i < (int)inputs.size(); i++) {
 		std::vector<float> pred = net.forward(inputs[i]);
 		std::cout << "{ " << inputs[i][0] << ", " << inputs[i][1] << " }" << " = " << pred[0] << std::endl;

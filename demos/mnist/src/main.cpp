@@ -115,7 +115,7 @@ int main() {
     float learningRate = 0.01f;
 
     //train function, 1 epoch.
-    net.train(training.inputs, training.targets, 3, learningRate);
+    net.train(training.inputs, training.targets, 3, learningRate, LossTypes::MSE);
 
     
     //Global Accuracy Calculation
