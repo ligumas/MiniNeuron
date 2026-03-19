@@ -14,48 +14,6 @@ struct MNISTData {
     std::vector<std::vector<float>> targets;
 };
 
-//for loadign the mnist data from csv file
-MNISTData loadMnist(const std::string& path, size_t size) {
-    std::ifstream file(path);
-
-    MNISTData data;
-
-    if (!file.is_open()) {
-        std::cout << "Failed to open file" << std::endl;
-        return data;
-    }
-
-    data.inputs.reserve(size);
-    data.targets.reserve(size);
-
-    std::string line;
-    std::getline(file, line);
-    size_t linesLoaded = 1;
-    while (std::getline(file, line)) {
-        std::vector<float> img;
-        img.reserve(784);
-        std::vector<float> target(10, 0.0f);
-
-        std::stringstream ss(line);
-        std::string cell;
-        std::getline(ss, cell, ',');
-
-        target[stoi(cell)] = 1.0f;
-
-        while (std::getline(ss, cell, ',')) {
-            img.push_back(std::stof(cell) / 255.0f);
-        }
-        data.inputs.push_back(img);
-        data.targets.push_back(target);
-        std::cout << "\rProgress: " << linesLoaded << std::flush;
-        linesLoaded++;
-    }
-    std::cout << std::endl;
-
-    file.close();
-    return data;
-}
-
 int reverseInt(int i) {
     unsigned char c1, c2, c3, c4;
     c1 = i & 255;
@@ -123,7 +81,7 @@ std::vector<std::vector<float>> loadImages(const std::string& path) {
     return imgs;
 }
 
-MNISTData loadMnistV2(const std::string& imgPath, const std::string& labelPath) {
+MNISTData loadMnist(const std::string& imgPath, const std::string& labelPath) {
     MNISTData data;
     data.inputs = loadImages(imgPath);
     std::vector<int> labels = loadLabels(labelPath);
@@ -141,22 +99,23 @@ int main() {
     MiniNeuron::Network net;
 
     //structure of layers 784 -> 128 -> 10
-    net.add(MiniNeuron::Layer(128, 784, ActivationType::Sigmoid, InitializerType::Xavier));
+    net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
+    net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
     net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
 
     //init all layer weights, bias and other stuff
     net.initLayers();
 
     //define learning data for mnist
-    MNISTData training = loadMnistV2("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
-    MNISTData testing = loadMnistV2("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
+    MNISTData training = loadMnist("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
+    MNISTData testing = loadMnist("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
     std::cout << "Training samples: " << training.inputs.size() << std::endl;
     std::cout << "Testing samples: " << testing.inputs.size() << std::endl;
 
-    float learningRate = 0.05f;
+    float learningRate = 0.01f;
 
     //train function, 1 epoch.
-    net.train(training.inputs, training.targets, 1, learningRate);
+    net.train(training.inputs, training.targets, 3, learningRate);
 
     
     //Global Accuracy Calculation
