@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cassert>
 
+#include <chrono>
+
 namespace MiniNeuron {
 
 	//add layer to the back of the network. also prints a debug text.
@@ -16,6 +18,7 @@ namespace MiniNeuron {
 	void Network::initLayers() {
 		for (size_t i = 0; i < layers.size(); i++) {
 			layers[i].initLayer();
+			start = std::chrono::high_resolution_clock::now();
 		}
 	}
 
@@ -118,11 +121,14 @@ namespace MiniNeuron {
 		std::cout << "Starting Training..." << std::endl;
 		for (int i = 0; i < epochs; i++) {
 			float avgLoss = epoch(inputs, targets, learningRate, losstype);
-			if (i % 100 == 0) {
+			if (i % 1 == 0) {
 				std::cout.precision(8);
 				std::cout << std::fixed;
 				std::cout << "Epoch: " << i
 					<< " | Loss: " << avgLoss << std::endl;
+				std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+				std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+				std::cout << "Program ran for " << duration.count() << " seconds\n\n";
 			}
 			std::cout.unsetf(std::ios::fixed);
 		}

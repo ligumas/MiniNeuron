@@ -4,6 +4,8 @@
 #include "loss_types.h"
 #include <vector>
 
+#include <chrono>
+
 namespace MiniNeuron {
 
 	class Network {
@@ -27,6 +29,9 @@ namespace MiniNeuron {
 
 	private:
 		std::vector<Layer> layers;
+
+		std::chrono::high_resolution_clock::time_point start;
+
 	};
 
 }
