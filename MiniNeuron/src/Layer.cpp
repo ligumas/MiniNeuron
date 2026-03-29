@@ -11,16 +11,22 @@ namespace MiniNeuron {
 		this->m_inputCount = inputCount;
 		this->activation = activation;
 		this->initializer = initializer;
+
+		
 	}
 
-	void Layer::initLayer() {
-		//size all vectors for better and safer use.
+	void Layer::initSizes() {
 		m_weights.resize(m_neuronCount, std::vector<float>(m_inputCount, 0.0f));
 		m_biases.resize(m_neuronCount, 0);
 		m_delta.resize(m_neuronCount, 0.0f);
 		m_zResult.resize(m_neuronCount, 0.0f);
 		m_result.resize(m_neuronCount, 0.0f);
+	}
 
+	void Layer::initLayer() {
+
+		initSizes();
+		
 		switch (initializer) {
 		case InitializerType::HeInit:
 		{
@@ -67,18 +73,18 @@ namespace MiniNeuron {
 
 
 	std::vector<float> Layer::Forward(const std::vector<float>& input) {
+		std::fill(m_result.begin(), m_result.end(), 0.0f);
 
 		if (m_weights[0].size() != input.size()) {
 			std::cout << "Invalid input in matrix multiplication " << std::endl;
+			std::invalid_argument;
 		}
-
 		#pragma omp parallel for
-		for (int i = 0; i < (int)m_neuronCount; i++) {
-			float sum = 0.0f;
-			for (size_t j = 0; j < m_inputCount; j++) {
-				sum += input[j] * m_weights[i][j];
+		for (int i = 0; i < m_neuronCount; i++) {
+			for (int j = 0; j < m_inputCount; j++) {
+				m_result[i] += input[j] * m_weights[i][j];
 			}
-			m_result[i] = sum + m_biases[i];
+			m_result[i] += m_biases[i];
 		}
 
 		//copy result before adding activation
@@ -96,19 +102,20 @@ namespace MiniNeuron {
 		}
 		case ActivationType::Softmax:
 		{
-			float max_val = *std::max_element(m_result.begin(), m_result.end());
-			float sum = 0.0f;
-			for (auto& v : m_result) {
-				v = std::exp(v - max_val);
-				sum += v;
+			float max_val = m_result[0];
+			for (size_t i = 1; i < m_neuronCount; i++) {
+				if (m_result[i] > max_val) max_val = m_result[i];
 			}
-
+			float sum = 0.0f;
+			for (size_t i = 0; i < m_neuronCount; i++) {
+				m_result[i] = std::exp(m_result[i] - max_val);
+				sum += m_result[i];
+			}
 			if (sum == 0.0f) {
 				throw std::invalid_argument("Softmax sum is zero");
 			}
-
 			#pragma omp parallel for
-			for (int i = 0; i < (int)m_neuronCount; i++) {
+			for (int i = 0; i < m_neuronCount; i++) {
 				m_result[i] /= sum;
 			}
 			break;
@@ -117,7 +124,7 @@ namespace MiniNeuron {
 		{
 			#pragma omp parallel for
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = 1.0f / (1.0f + std::expf(-m_result[i]));
+				m_result[i] = 1.0f / (1.0f + std::exp(-m_result[i]));
 			}
 			break;
 		}

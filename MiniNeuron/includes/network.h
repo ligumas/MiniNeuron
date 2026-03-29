@@ -3,7 +3,7 @@
 #include "Layer.h"
 #include "loss_types.h"
 #include <vector>
-
+#include <string>
 #include <chrono>
 
 namespace MiniNeuron {
@@ -23,6 +23,10 @@ namespace MiniNeuron {
 		//loss
 		float loss(const std::vector<float>& p, const std::vector<float>& y, LossTypes losstype);
 		float lossDerivative(float p, float y, LossTypes losstype);
+
+		//save load
+		void saveModel(const std::string& filePath);
+		void loadModel(const std::string& filePath);
 
 		//debug
 		void printNetwork();
