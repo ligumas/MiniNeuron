@@ -98,19 +98,20 @@ int main() {
     //make the neural network object
     MiniNeuron::Network net;
 
-    //structure of layers 784 -> 128 -> 10
-    net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
-    net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
-    net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
-
-    //net.add(MiniNeuron::Layer(128, 784, ActivationType::Sigmoid, InitializerType::Xavier));
+    //structure of layers 784 -> 256 -> 128 -> 10
+    //net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
+    //net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
     //net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
+
+    //structure of layers 784 -> 128 -> 10
+    net.add(MiniNeuron::Layer(128, 784, ActivationType::Sigmoid, InitializerType::Xavier));
+    net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
 
     //init all layer weights, bias and other stuff
     net.initLayers();
 
     
-    //net.loadModel();
+    //net.loadModel("mnist-relu-v1.1.0.mn");
 
     //define learning data for mnist
     MNISTData training = loadMnist("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
@@ -118,10 +119,10 @@ int main() {
     std::cout << "Training samples: " << training.inputs.size() << std::endl;
     std::cout << "Testing samples: " << testing.inputs.size() << std::endl;
 
-    float learningRate = 0.005f;
+    float learningRate = 0.08f;
 
     //train function, 1 epoch.
-    net.train(training.inputs, training.targets, 3, learningRate, LossTypes::crossEntropy);
+    net.train(training.inputs, training.targets, 1, learningRate, LossTypes::crossEntropy);
 
     
     //Global Accuracy Calculation
@@ -167,7 +168,7 @@ int main() {
     std::cout << " Total Correct: " << correctPredictions << " / " << totalTestSamples << std::endl;
     std::cout << "========================================" << std::endl;
 
-    net.saveModel("mnist-relu-v1.1.0.mn");
+    net.saveModel("mnist-sigmoid-v1.1.0.mn");
 
     return 0;
 }
