@@ -2,7 +2,11 @@
 #include "Layer.h"
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <cassert>
+#include <string>
+
+#include <chrono>
 
 namespace MiniNeuron {
 
@@ -116,15 +120,105 @@ namespace MiniNeuron {
 
 	void Network::train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int epochs, float learningRate, LossTypes losstype) {
 		std::cout << "Starting Training..." << std::endl;
+		start = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < epochs; i++) {
 			float avgLoss = epoch(inputs, targets, learningRate, losstype);
-			if (i % 100 == 0) {
+			if (i % 1 == 0) {
 				std::cout.precision(8);
 				std::cout << std::fixed;
 				std::cout << "Epoch: " << i
 					<< " | Loss: " << avgLoss << std::endl;
+				std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+				std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+				std::cout << "Program ran for " << duration.count() << " seconds\n\n";
 			}
 			std::cout.unsetf(std::ios::fixed);
+		}
+	}
+
+	void Network::saveModel(const std::string& filePath) {
+		std::fstream fout;
+
+		fout.open(filePath, std::ios::out | std::ios::binary);
+
+		unsigned short numLayers = (unsigned short)layers.size();
+
+		if (fout) {
+			fout.write(reinterpret_cast<char*>(&numLayers), sizeof(unsigned short));
+			
+			for (size_t l= 0; l< layers.size(); l++) {
+				unsigned short neuronCount = (unsigned short)layers[l].getNeuronCount();
+				unsigned short inputCount = (unsigned short)layers[l].getInputCount();
+				fout.write(reinterpret_cast<char*>(&neuronCount), sizeof(unsigned short));
+				fout.write(reinterpret_cast<char*>(&inputCount), sizeof(unsigned short));
+				int act = (int)layers[l].getActivation();
+				int init = (int)layers[l].getInitializer();
+				fout.write(reinterpret_cast<char*>(&act), sizeof(int));
+				fout.write(reinterpret_cast<char*>(&init), sizeof(int));
+				for (size_t i = 0; i < layers[l].getNeuronCount(); i++) {
+					fout.write(reinterpret_cast<const char*>(layers[l].getWeights()[i].data()),
+						layers[l].getInputCount() * sizeof(float));
+				}
+				fout.write(reinterpret_cast<const char*>(layers[l].getBiases().data()), layers[l].getNeuronCount() * sizeof(float));
+			}
+			fout.close();
+			std::cout << "Model saved" << std::endl;
+		}
+		else {
+			std::cout << "Failed to open file to save model" << std::endl;
+		}
+
+	}
+
+	void Network::loadModel(const std::string& filePath) {
+		std::fstream fin;
+
+		fin.open(filePath, std::ios::in | std::ios::binary);
+
+		if (fin) {
+			unsigned short numLayers;
+			fin.read(reinterpret_cast<char*>(&numLayers), sizeof(unsigned short));
+
+			for (int i = 0; i < numLayers; i++) {
+				unsigned short neuronCount;
+				unsigned short inputCount;
+
+				fin.read(reinterpret_cast<char*>(&neuronCount), sizeof(unsigned short));
+				fin.read(reinterpret_cast<char*>(&inputCount), sizeof(unsigned short));
+
+				int actInt;
+				int initInt;
+
+				fin.read(reinterpret_cast<char*>(&actInt), sizeof(int));
+				fin.read(reinterpret_cast<char*>(&initInt), sizeof(int));
+
+				ActivationType act = (ActivationType)actInt;
+				InitializerType init = (InitializerType)initInt;
+
+				Layer tempLayer(neuronCount, inputCount, act, init);
+
+				std::vector<std::vector<float>> weights(neuronCount, std::vector<float>(inputCount));
+				for (size_t i = 0; i < neuronCount; i++) {
+					fin.read(reinterpret_cast<char*>(weights[i].data()), inputCount * sizeof(float));
+				}
+
+				tempLayer.initSizes();
+
+				tempLayer.setWeights(weights);
+
+				std::vector<float> biases(neuronCount);
+				fin.read(reinterpret_cast<char*>(biases.data()), neuronCount * sizeof(float));
+				tempLayer.setBiases(biases);
+
+				add(std::move(tempLayer));
+			}
+
+			fin.close();
+
+			std::cout << "Model loaded" << std::endl;
+		}
+		else {
+
 		}
 	}
 

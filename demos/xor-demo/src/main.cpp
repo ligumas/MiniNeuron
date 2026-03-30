@@ -33,5 +33,7 @@ int main() {
 		std::cout << "{ " << inputs[i][0] << ", " << inputs[i][1] << " }" << " = " << pred[0] << std::endl;
 	}
 
+	net.saveModel("xor-sigmoid-v1.1.0.mn");
+
 	return 0;
 }

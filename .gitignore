@@ -365,3 +365,7 @@ FodyWeavers.xsd
 #training data
 mnist_test.csv
 mnist_train.csv
+
+#models
+.mn
+/demos/xor-demo/xor-sigmoid-v1.1.0.mn
