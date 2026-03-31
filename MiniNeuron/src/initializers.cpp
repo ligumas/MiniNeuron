@@ -1,4 +1,4 @@
-#include "initializers.h";
+#include "initializers.h"
 #include <cmath>
 #include <random>
 

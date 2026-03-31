@@ -1,5 +1,6 @@
 #include "network.h"
 #include "Layer.h"
+#include "Matrix.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -85,7 +86,8 @@ namespace MiniNeuron {
 			bool isOutput = (i == layers.size() - 1);
 
 			if (isOutput) {
-				layers[i].backpropagation(targets, {}, true);
+				Matrix empty(0, 0);
+				layers[i].backpropagation(targets, empty, true);
 			} else {
 				layers[i].backpropagation(layers[i + 1].getDelta(), layers[i + 1].getWeights(), false);
 			}
@@ -102,7 +104,7 @@ namespace MiniNeuron {
 		}
 	}
 
-	float Network::epoch(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets, float learningRate, LossTypes losstype) {
+	float Network::epoch(const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, float learningRate, LossTypes losstype) {
 		float total_loss = 0.0f;
 		assert(inputs.size() == targets.size());
 		for (size_t i = 0; i < inputs.size(); i++)
@@ -118,7 +120,7 @@ namespace MiniNeuron {
 		return total_loss / inputs.size();
 	}
 
-	void Network::train(const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int epochs, float learningRate, LossTypes losstype) {
+	void Network::train(const const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets,int epochs, float learningRate, LossTypes losstype) {
 		std::cout << "Starting Training..." << std::endl;
 		start = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < epochs; i++) {
@@ -156,8 +158,8 @@ namespace MiniNeuron {
 				fout.write(reinterpret_cast<char*>(&act), sizeof(int));
 				fout.write(reinterpret_cast<char*>(&init), sizeof(int));
 				for (size_t i = 0; i < layers[l].getNeuronCount(); i++) {
-					fout.write(reinterpret_cast<const char*>(layers[l].getWeights()[i].data()),
-						layers[l].getInputCount() * sizeof(float));
+					fout.write(reinterpret_cast<const char*>(layers[l].getWeights().data.data()),
+						layers[l].getWeights().data.size() * sizeof(float));
 				}
 				fout.write(reinterpret_cast<const char*>(layers[l].getBiases().data()), layers[l].getNeuronCount() * sizeof(float));
 			}
@@ -197,9 +199,9 @@ namespace MiniNeuron {
 
 				Layer tempLayer(neuronCount, inputCount, act, init);
 
-				std::vector<std::vector<float>> weights(neuronCount, std::vector<float>(inputCount));
+				Matrix weights(inputCount, neuronCount );
 				for (size_t i = 0; i < neuronCount; i++) {
-					fin.read(reinterpret_cast<char*>(weights[i].data()), inputCount * sizeof(float));
+					fin.read(reinterpret_cast<char*>(weights.data.data()), weights.data.size() * sizeof(float));
 				}
 
 				tempLayer.initSizes();

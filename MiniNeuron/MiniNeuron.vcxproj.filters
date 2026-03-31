@@ -41,5 +41,8 @@
     <ClInclude Include="includes\loss_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
