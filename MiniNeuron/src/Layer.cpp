@@ -7,7 +7,10 @@
 
 namespace MiniNeuron {
 
-	Layer::Layer(size_t neuronCount, size_t inputCount, ActivationType activation, InitializerType initializer) : m_weights(neuronCount, inputCount) {
+	Layer::Layer(size_t neuronCount, size_t inputCount, ActivationType activation, InitializerType initializer)
+		: m_weights(neuronCount, inputCount) ,
+		  m_weightGradients(neuronCount, inputCount)
+	{
 		this->m_neuronCount = neuronCount;
 		this->m_inputCount = inputCount;
 		this->activation = activation;
@@ -15,7 +18,8 @@ namespace MiniNeuron {
 	}
 
 	void Layer::initSizes() {
-		m_biases.resize(m_neuronCount, 0);
+		m_biases.resize(m_neuronCount, 0.0f);
+		m_biasGradients.resize(m_neuronCount, 0.0f);
 		m_delta.resize(m_neuronCount, 0.0f);
 		m_zResult.resize(m_neuronCount, 0.0f);
 		m_result.resize(m_neuronCount, 0.0f);
@@ -46,7 +50,7 @@ namespace MiniNeuron {
 		std::cout << "weights initialized" << std::endl; // debug print
 	}
 
-	std::vector<float> Layer::Forward(const std::vector<float>& input) {
+	const std::vector<float>& Layer::Forward(const std::vector<float>& input) {
 		const float* __restrict inPtr = input.data();
 
 		if (m_weights.cols != input.size()) {
@@ -63,30 +67,27 @@ namespace MiniNeuron {
 			for (int j = 0; j < m_inputCount; j++) {
 				sum += inPtr[j] * rptr[j];
 			}
-			m_result[i] = sum;
+			m_zResult[i] = sum;
 		}
-
-		//copy result before adding activation
-		m_zResult = m_result;
 
 		//switch case to choose the activasion method
 		switch (activation) {
 		case ActivationType::ReLU:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::max(0.0f, m_result[i]);
+				m_result[i] = std::max(0.0f, m_zResult[i]);
 			}
 			break;
 		}
 		case ActivationType::Softmax:
 		{
-			float max_val = m_result[0];
+			float max_val = m_zResult[0];
 			for (int i = 1; i < m_neuronCount; i++) {
-				if (m_result[i] > max_val) max_val = m_result[i];
+				if (m_zResult[i] > max_val) max_val = m_zResult[i];
 			}
 			float sum = 0.0f;
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::exp(m_result[i] - max_val);
+				m_result[i] = std::expf(m_zResult[i] - max_val);
 				sum += m_result[i];
 			}
 			if (sum == 0.0f) {
@@ -100,7 +101,7 @@ namespace MiniNeuron {
 		case ActivationType::Sigmoid:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = 1.0f / (1.0f + std::expf(-m_result[i]));
+				m_result[i] = 1.0f / (1.0f + std::expf(-m_zResult[i]));
 			}
 			break;
 		}
@@ -113,7 +114,7 @@ namespace MiniNeuron {
 		return(m_result);
 	}
 
-	float Layer::calculateActivationDerivative(float val) {
+	inline float Layer::calculateActivationDerivative(float val) {
 		switch (activation) {
 		case ActivationType::ReLU:
 		{
@@ -133,14 +134,27 @@ namespace MiniNeuron {
 		}
 	}
 
-	void Layer::backpropagation(const std::vector<float>& prev_delta, const Matrix& previous_weights, bool isOutput) {
+	void Layer::backpropagation(const std::vector<float>& prev_delta, const Matrix& previous_weights, const std::vector<float>& inputs, bool isOutput) {
 		const int prevSize = (int)prev_delta.size();
+		const float* __restrict inPtr = inputs.data();
+		const int inputSize = (int)inputs.size();
+
 		if (isOutput) {
 #pragma omp parallel for
 			for (int i = 0; i < m_neuronCount; i++) {
 				float error = (m_result[i] - prev_delta[i]);
+
 				m_zResult[i] = calculateActivationDerivative(m_zResult[i]);
 				this->m_delta[i] = error * m_zResult[i];
+
+				//store gradients
+				float scaled_delta = m_delta[i];
+				float* weightGradptr = m_weightGradients.row(i);
+				#pragma omp simd
+				for (int j = 0; j < inputSize; j++) {
+					weightGradptr[j] += scaled_delta * inPtr[j];
+				}
+				m_biasGradients[i] += scaled_delta;
 			}
 		}
 		else {
@@ -150,25 +164,36 @@ namespace MiniNeuron {
 				for (int j = 0; j < prevSize; j++) {
 					error += prev_delta[j] * previous_weights(j, i);
 				}
+
 				m_zResult[i] = calculateActivationDerivative(m_zResult[i]);
 				this->m_delta[i] = error * m_zResult[i];
+
+				//store gradients
+				float scaled_delta = m_delta[i];
+				float* weightGradptr = m_weightGradients.row(i);
+				#pragma omp simd
+				for (int j = 0; j < inputSize; j++) {
+					weightGradptr[j] += scaled_delta * inPtr[j];
+				}
+				m_biasGradients[i] += scaled_delta;
 			}
 		}
 	}
 
-	void Layer::updateWeights(const std::vector<float>& input, float learningRate) {
-		const float* __restrict inPtr = input.data();
-
+	void Layer::updateWeights(int batchSize, float learningRate) {
+		float scale = learningRate / batchSize;
 		#pragma omp parallel for
 		for (int i = 0; i < m_neuronCount; i++) {
-			float* rptr = m_weights.row(i);
-			float scaled_delta = learningRate * m_delta[i];
+			float* weightptr = m_weights.row(i);
+			float* weightGradptr = m_weightGradients.row(i);
+			#pragma omp simd
 			for (int j = 0; j < m_inputCount; j++) {
-				float change = scaled_delta * inPtr[j];
-				rptr[j] -= change;
+				weightptr[j] -= scale * weightGradptr[j];
 			}
-			m_biases[i] -= learningRate * m_delta[i];
+			m_biases[i] -= scale * m_biasGradients[i];;
 		}
+		m_weightGradients.clear();
+		m_biasGradients.assign(m_neuronCount, 0.0f);
 	}
 
 }

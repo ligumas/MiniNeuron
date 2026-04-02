@@ -81,30 +81,28 @@ namespace MiniNeuron {
 		}
 	}
 
-	void Network::backpropagate(const std::vector<float>& targets) {
+	void Network::backpropagate(const std::vector<float>& targets, const std::vector<float>& inputs) {
 		for (int i = (int)layers.size() - 1; i >= 0; i--) {
 			bool isOutput = (i == layers.size() - 1);
 
 			if (isOutput) {
 				Matrix empty(0, 0);
-				layers[i].backpropagation(targets, empty, true);
+				layers[i].backpropagation(targets, empty, layers[i - 1].getResult(), true);
+			} else if (i == 0) {
+				layers[i].backpropagation(layers[i + 1].getDelta(), layers[i + 1].getWeights(), inputs, false);
 			} else {
-				layers[i].backpropagation(layers[i + 1].getDelta(), layers[i + 1].getWeights(), false);
+				layers[i].backpropagation(layers[i + 1].getDelta(), layers[i + 1].getWeights(), layers[i - 1].getResult(), false);
 			}
 		}
 	}
 
-	void Network::updateNetwork(const std::vector<float>& inputs, float learningRate) {
+	void Network::updateNetwork(int batchSize, float learningRate) {
 		for (size_t i = 0; i < layers.size(); i++) {
-			if (i == 0) {
-				layers[i].updateWeights(inputs, learningRate);
-			}else {
-				layers[i].updateWeights(layers[i - 1].getResult(), learningRate);
-			}
+			layers[i].updateWeights(batchSize, learningRate);
 		}
 	}
 
-	float Network::epoch(const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, float learningRate, LossTypes losstype) {
+	float Network::epoch(const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, int batchSize, float learningRate, LossTypes losstype) {
 		float total_loss = 0.0f;
 		assert(inputs.size() == targets.size());
 		for (size_t i = 0; i < inputs.size(); i++)
@@ -114,17 +112,19 @@ namespace MiniNeuron {
 
 			std::vector<float> prediction = forward(x);
 			total_loss += loss(prediction, y, LossTypes::crossEntropy);
-			backpropagate(y);
-			updateNetwork(x, learningRate);
+			backpropagate(y, x);
+			if ((i + 1) % batchSize == 0) {
+				updateNetwork(batchSize, learningRate);
+			}
 		}
 		return total_loss / inputs.size();
 	}
 
-	void Network::train(const const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets,int epochs, float learningRate, LossTypes losstype) {
+	void Network::train(const const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, int batchSize, int epochs, float learningRate, LossTypes losstype) {
 		std::cout << "Starting Training..." << std::endl;
 		start = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < epochs; i++) {
-			float avgLoss = epoch(inputs, targets, learningRate, losstype);
+			float avgLoss = epoch(inputs, targets, batchSize, learningRate, losstype);
 			if (i % 1 == 0) {
 				std::cout.precision(8);
 				std::cout << std::fixed;

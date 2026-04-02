@@ -24,7 +24,7 @@ int main() {
 	float learningRate = 5.0f;
 
 	//train function, 5000 epochs.
-	net.train(inputs, targets, 500, learningRate, LossTypes::crossEntropy);
+	net.train(inputs, targets, 1, 500, learningRate, LossTypes::crossEntropy);
 
 	//print prediction for all inputs to check final perfomance
 	std::cout << std::fixed << std::setprecision(2);
