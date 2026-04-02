@@ -16,10 +16,10 @@ namespace MiniNeuron {
 		void add(Layer&& x);
 		void initLayers ();
 		std::vector<float> forward(const std::vector<float>& inputs);
-		void backpropagate(const std::vector<float>& targets);
-		void updateNetwork(const std::vector<float>& inputs, float learningRate);
-		float epoch(const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, float learningRate, LossTypes losstype);
-		void train(const const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets, int epochs, float learningRate, LossTypes losstype = LossTypes::MSE);
+		void backpropagate(const std::vector<float>& targets, const std::vector<float>& inputs);
+		void updateNetwork(int batchSize, float learningRate);
+		float epoch(const std::vector<std::vector<float>>& inputs, const const std::vector<std::vector<float>>& targets, int batchSize, float learningRate, LossTypes losstype);
+		void train(const const std::vector<std::vector<float>>& inputs, const std::vector<std::vector<float>>& targets,int batchSize, int epochs, float learningRate, LossTypes losstype = LossTypes::MSE);
 
 		//loss
 		float loss(const std::vector<float>& p, const std::vector<float>& y, LossTypes losstype);

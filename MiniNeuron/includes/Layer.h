@@ -17,9 +17,9 @@ namespace MiniNeuron {
 
 		//Core functionality
 		float calculateActivationDerivative(float);
-	    std::vector<float> Forward(const std::vector<float>& Input);
-		void backpropagation(const std::vector<float>& previous_delta,const Matrix& previous_weights, bool isOutput);
-		void updateWeights(const std::vector<float>& inputs, float learningRate);
+		const std::vector<float>& Forward(const std::vector<float>& Input);
+		void backpropagation(const std::vector<float>& previous_delta,const Matrix& previous_weights, const std::vector<float>& input, bool isOutput);
+		void updateWeights(int batchSize, float learningRate);
 
 		//get functions
 		size_t getNeuronCount() const { return m_neuronCount; }
@@ -47,6 +47,10 @@ namespace MiniNeuron {
 		std::vector<float> m_result; //final result after activation
 		std::vector<float> m_zResult; //pre-activation result
 		std::vector<float> m_delta;
+
+		//gradients
+		Matrix m_weightGradients;
+		std::vector<float> m_biasGradients;
 	};
 
 

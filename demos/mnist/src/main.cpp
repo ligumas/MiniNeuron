@@ -119,10 +119,10 @@ int main() {
     std::cout << "Training samples: " << training.inputs.size() << std::endl;
     std::cout << "Testing samples: " << testing.inputs.size() << std::endl;
 
-    float learningRate = 0.008f;
+    float learningRate = 0.08f;
 
     //train function, 1 epoch.
-    net.train(training.inputs, training.targets, 3, learningRate, LossTypes::crossEntropy);
+    net.train(training.inputs, training.targets, 32, 3, learningRate, LossTypes::crossEntropy);
 
     
     //Global Accuracy Calculation
