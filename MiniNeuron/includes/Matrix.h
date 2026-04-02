@@ -11,6 +11,7 @@ namespace MiniNeuron {
 		std::vector<float> data;
 
 		Matrix(int x, int y) : rows(x), cols(y), data(x* y, 0.0f) {}
+		Matrix() : rows(0), cols(0) {}
 
 		//non const acces
 		inline float& operator()(int x, int y) {

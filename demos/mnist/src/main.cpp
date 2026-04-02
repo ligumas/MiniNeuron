@@ -98,6 +98,7 @@ int main() {
     //make the neural network object
     MiniNeuron::Network net;
 
+    
     //structure of layers 784 -> 256 -> 128 -> 10
     net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
     net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
@@ -114,12 +115,14 @@ int main() {
     //net.loadModel("mnist-relu-v1.1.0.mn");
 
     //define learning data for mnist
-    MNISTData training = loadMnist("mnist/train-images-idx3-ubyte", "mnist/train-labels-idx1-ubyte");
-    MNISTData testing = loadMnist("mnist/t10k-images-idx3-ubyte", "mnist/t10k-labels-idx1-ubyte");
+    MNISTData training = loadMnist("fashionMnist/train-images-idx3-ubyte", "fashionMnist/train-labels-idx1-ubyte");
+    MNISTData testing = loadMnist("fashionMnist/t10k-images-idx3-ubyte", "fashionMnist/t10k-labels-idx1-ubyte");
     std::cout << "Training samples: " << training.inputs.size() << std::endl;
     std::cout << "Testing samples: " << testing.inputs.size() << std::endl;
 
-    float learningRate = 0.08f;
+    float learningRate = 0.001f;
+
+    net.setOptimizer(OptimizerType::SGD);
 
     //train function, 1 epoch.
     net.train(training.inputs, training.targets, 32, 3, learningRate, LossTypes::crossEntropy);

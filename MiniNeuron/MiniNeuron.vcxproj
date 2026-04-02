@@ -25,6 +25,7 @@
     <ClInclude Include="includes\network.h" />
     <ClInclude Include="includes\initializers.h" />
     <ClInclude Include="includes\Layer.h" />
+    <ClInclude Include="includes\optimizer_types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\initializers.cpp" />

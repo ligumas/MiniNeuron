@@ -24,6 +24,12 @@ namespace MiniNeuron {
 		}
 	}
 
+	void Network::setOptimizer(OptimizerType optimizer) {
+		for (size_t i = 0; i < layers.size(); i++) {
+			layers[i].initOptimizer(optimizer);
+		}
+	}
+
 	//prints all layers and shows thier neuron count. used for debug, to be changed.
 	void Network::printNetwork() {
 		for (size_t i = 0; i < layers.size(); i++) {

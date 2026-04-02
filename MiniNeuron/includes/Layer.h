@@ -2,6 +2,7 @@
 #include <vector>
 #include "Matrix.h"
 #include "activation_types.h"
+#include "optimizer_types.h"
 #include "initializers.h"
 
 namespace MiniNeuron {
@@ -11,9 +12,10 @@ namespace MiniNeuron {
 	public:
 		Layer(size_t neuronCount, size_t inputCount, ActivationType, InitializerType); //constructor
 
-		//weight initilization
+		// initilization
 		void initSizes();
 		void initLayer(); 
+		void initOptimizer(OptimizerType optimizer = OptimizerType::SGD);
 
 		//Core functionality
 		float calculateActivationDerivative(float);
@@ -41,6 +43,7 @@ namespace MiniNeuron {
 
 		InitializerType initializer = InitializerType::Xavier;
 		ActivationType activation = ActivationType::Linear;
+		OptimizerType optimizer = OptimizerType::SGD;
 
 		Matrix m_weights;
 		std::vector<float> m_biases;
@@ -51,6 +54,13 @@ namespace MiniNeuron {
 		//gradients
 		Matrix m_weightGradients;
 		std::vector<float> m_biasGradients;
+
+		//adam
+		Matrix m_firstMoment;
+		Matrix m_secondMoment;
+		std::vector<float> m_firstMomentBias;
+		std::vector<float> m_secondMomentBias;
+		int  m_timeStep;
 	};
 
 
