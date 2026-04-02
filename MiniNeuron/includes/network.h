@@ -2,6 +2,7 @@
 
 #include "Layer.h"
 #include "loss_types.h"
+#include "optimizer_types.h"
 #include "Matrix.h"
 #include <vector>
 #include <string>
@@ -24,6 +25,9 @@ namespace MiniNeuron {
 		//loss
 		float loss(const std::vector<float>& p, const std::vector<float>& y, LossTypes losstype);
 		float lossDerivative(float p, float y, LossTypes losstype);
+
+		//set optimizer
+		void setOptimizer(OptimizerType = OptimizerType::SGD);
 
 		//save load
 		void saveModel(const std::string& filePath);

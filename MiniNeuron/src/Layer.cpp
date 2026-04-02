@@ -8,13 +8,15 @@
 namespace MiniNeuron {
 
 	Layer::Layer(size_t neuronCount, size_t inputCount, ActivationType activation, InitializerType initializer)
-		: m_weights(neuronCount, inputCount) ,
-		  m_weightGradients(neuronCount, inputCount)
+		: m_weights(neuronCount, inputCount),
+		m_weightGradients(neuronCount, inputCount)
 	{
 		this->m_neuronCount = neuronCount;
 		this->m_inputCount = inputCount;
 		this->activation = activation;
 		this->initializer = initializer;	
+
+		this->m_timeStep = 1;
 	}
 
 	void Layer::initSizes() {
@@ -48,6 +50,21 @@ namespace MiniNeuron {
 		}
 		}
 		std::cout << "weights initialized" << std::endl; // debug print
+	}
+
+	void Layer::initOptimizer(OptimizerType op) {
+		switch (op) {
+		case OptimizerType::SGD:
+			optimizer = OptimizerType::SGD;
+			break;
+		case OptimizerType::Adam:
+			optimizer = OptimizerType::Adam;
+			m_firstMoment = Matrix(m_neuronCount, m_inputCount);
+			m_secondMoment = Matrix(m_neuronCount, m_inputCount);
+			m_firstMomentBias.resize(m_neuronCount, 0.0f);
+			m_secondMomentBias.resize(m_neuronCount, 0.0f);
+			break;
+		}
 	}
 
 	const std::vector<float>& Layer::Forward(const std::vector<float>& input) {
@@ -181,19 +198,78 @@ namespace MiniNeuron {
 	}
 
 	void Layer::updateWeights(int batchSize, float learningRate) {
-		float scale = learningRate / batchSize;
-		#pragma omp parallel for
-		for (int i = 0; i < m_neuronCount; i++) {
-			float* weightptr = m_weights.row(i);
-			float* weightGradptr = m_weightGradients.row(i);
-			#pragma omp simd
-			for (int j = 0; j < m_inputCount; j++) {
-				weightptr[j] -= scale * weightGradptr[j];
+
+		switch (optimizer) {
+		case OptimizerType::SGD:
+
+		{
+			float scale = learningRate / batchSize;
+			#pragma omp parallel for
+			for (int i = 0; i < m_neuronCount; i++) {
+				float* weightptr = m_weights.row(i);
+				float* weightGradptr = m_weightGradients.row(i);
+				#pragma omp simd
+				for (int j = 0; j < m_inputCount; j++) {
+					weightptr[j] -= scale * weightGradptr[j];
+				}
+				m_biases[i] -= scale * m_biasGradients[i];;
 			}
-			m_biases[i] -= scale * m_biasGradients[i];;
+			m_weightGradients.clear();
+			m_biasGradients.assign(m_neuronCount, 0.0f);
+			break;
 		}
-		m_weightGradients.clear();
-		m_biasGradients.assign(m_neuronCount, 0.0f);
+
+		case OptimizerType::Adam:
+
+		{
+
+			const float beta1 = 0.9f;
+			const float beta2 = 0.999f;
+			const float epsilon = 1e-8f;
+
+			float beta1Correction = 1.0f - pow(beta1, m_timeStep);
+			float beta2Correction = 1.0f - pow(beta2, m_timeStep);
+
+			const float oneMbeta1 = 1.0f - beta1;
+			const float oneMbeta2 = 1.0f - beta2;
+
+			#pragma omp parallel for
+			for (int i = 0; i < m_neuronCount; i++) {
+				
+
+				float* weightptr = m_weights.row(i);
+				float* weightGradptr = m_weightGradients.row(i);
+
+				float* fMptr = m_firstMoment.row(i);
+				float* sMptr = m_secondMoment.row(i);
+
+				#pragma omp simd
+				for (int j = 0; j < m_inputCount; j++) {
+					;
+					fMptr[j] = beta1 * fMptr[j] + oneMbeta1 * weightGradptr[j];
+					sMptr[j] = beta2 * sMptr[j] + oneMbeta2 * weightGradptr[j] * weightGradptr[j];
+
+					float mHat = fMptr[j] / beta1Correction;
+					float vHat = sMptr[j] / beta2Correction;
+
+					weightptr[j] -= learningRate * mHat / (sqrtf(vHat) + epsilon);
+				}
+				m_firstMomentBias[i] = beta1 * m_firstMomentBias[i] + oneMbeta1 * m_biasGradients[i];
+				m_secondMomentBias[i] = beta2 * m_secondMomentBias[i] + oneMbeta2 * m_biasGradients[i] * m_biasGradients[i];
+
+				float mHat = m_firstMomentBias[i] / beta1Correction;
+				float vHat = m_secondMomentBias[i] / beta2Correction;
+
+				m_biases[i] -= learningRate * mHat / (sqrtf(vHat) + epsilon);
+			}
+			m_weightGradients.clear();
+			m_biasGradients.assign(m_neuronCount, 0.0f);
+			m_timeStep++;
+			break;
+		}
+
+		}
+
 	}
 
 }
