@@ -67,30 +67,27 @@ namespace MiniNeuron {
 			for (int j = 0; j < m_inputCount; j++) {
 				sum += inPtr[j] * rptr[j];
 			}
-			m_result[i] = sum;
+			m_zResult[i] = sum;
 		}
-
-		//copy result before adding activation
-		m_zResult = m_result;
 
 		//switch case to choose the activasion method
 		switch (activation) {
 		case ActivationType::ReLU:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::max(0.0f, m_result[i]);
+				m_result[i] = std::max(0.0f, m_zResult[i]);
 			}
 			break;
 		}
 		case ActivationType::Softmax:
 		{
-			float max_val = m_result[0];
+			float max_val = m_zResult[0];
 			for (int i = 1; i < m_neuronCount; i++) {
-				if (m_result[i] > max_val) max_val = m_result[i];
+				if (m_zResult[i] > max_val) max_val = m_zResult[i];
 			}
 			float sum = 0.0f;
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::exp(m_result[i] - max_val);
+				m_result[i] = std::expf(m_zResult[i] - max_val);
 				sum += m_result[i];
 			}
 			if (sum == 0.0f) {
@@ -104,7 +101,7 @@ namespace MiniNeuron {
 		case ActivationType::Sigmoid:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = 1.0f / (1.0f + std::expf(-m_result[i]));
+				m_result[i] = 1.0f / (1.0f + std::expf(-m_zResult[i]));
 			}
 			break;
 		}
