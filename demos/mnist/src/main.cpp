@@ -99,13 +99,13 @@ int main() {
     MiniNeuron::Network net;
 
     //structure of layers 784 -> 256 -> 128 -> 10
-    //net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
-    //net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
-    //net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
+    net.add(MiniNeuron::Layer(256, 784, ActivationType::ReLU, InitializerType::HeInit));
+    net.add(MiniNeuron::Layer(128, 256, ActivationType::ReLU, InitializerType::HeInit));
+    net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
 
     //structure of layers 784 -> 128 -> 10
-    net.add(MiniNeuron::Layer(128, 784, ActivationType::Sigmoid, InitializerType::Xavier));
-    net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
+    //net.add(MiniNeuron::Layer(128, 784, ActivationType::Sigmoid, InitializerType::Xavier));
+    //net.add(MiniNeuron::Layer(10, 128, ActivationType::Softmax, InitializerType::Xavier));
 
     //init all layer weights, bias and other stuff
     net.initLayers();
@@ -114,15 +114,15 @@ int main() {
     //net.loadModel("mnist-relu-v1.1.0.mn");
 
     //define learning data for mnist
-    MNISTData training = loadMnist("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
-    MNISTData testing = loadMnist("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
+    MNISTData training = loadMnist("mnist/train-images-idx3-ubyte", "mnist/train-labels-idx1-ubyte");
+    MNISTData testing = loadMnist("mnist/t10k-images-idx3-ubyte", "mnist/t10k-labels-idx1-ubyte");
     std::cout << "Training samples: " << training.inputs.size() << std::endl;
     std::cout << "Testing samples: " << testing.inputs.size() << std::endl;
 
-    float learningRate = 0.08f;
+    float learningRate = 0.008f;
 
     //train function, 1 epoch.
-    net.train(training.inputs, training.targets, 1, learningRate, LossTypes::crossEntropy);
+    net.train(training.inputs, training.targets, 3, learningRate, LossTypes::crossEntropy);
 
     
     //Global Accuracy Calculation
