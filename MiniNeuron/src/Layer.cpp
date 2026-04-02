@@ -222,34 +222,45 @@ namespace MiniNeuron {
 		case OptimizerType::Adam:
 
 		{
+
+			const float beta1 = 0.9f;
+			const float beta2 = 0.999f;
+			const float epsilon = 1e-8f;
+
+			float beta1Correction = 1.0f - pow(beta1, m_timeStep);
+			float beta2Correction = 1.0f - pow(beta2, m_timeStep);
+
+			const float oneMbeta1 = 1.0f - beta1;
+			const float oneMbeta2 = 1.0f - beta2;
+
 			#pragma omp parallel for
 			for (int i = 0; i < m_neuronCount; i++) {
-				const float beta1 = 0.9f;
-				const float beta2 = 0.999f;
-				const float epsilon = 1e-8f;
+				
 
 				float* weightptr = m_weights.row(i);
 				float* weightGradptr = m_weightGradients.row(i);
+
 				float* fMptr = m_firstMoment.row(i);
 				float* sMptr = m_secondMoment.row(i);
+
 				#pragma omp simd
 				for (int j = 0; j < m_inputCount; j++) {
 					;
-					fMptr[j] = beta1 * fMptr[j] + (1 - beta1) * weightGradptr[j];
-					sMptr[j] = beta2 * sMptr[j] + (1 - beta2) * weightGradptr[j] * weightGradptr[j];
+					fMptr[j] = beta1 * fMptr[j] + oneMbeta1 * weightGradptr[j];
+					sMptr[j] = beta2 * sMptr[j] + oneMbeta2 * weightGradptr[j] * weightGradptr[j];
 
-					float mHat = fMptr[j] / (1.0f - pow(beta1, m_timeStep));
-					float vHat = sMptr[j] / (1.0f - pow(beta2, m_timeStep));
+					float mHat = fMptr[j] / beta1Correction;
+					float vHat = sMptr[j] / beta2Correction;
 
-					weightptr[j] -= learningRate * mHat / (sqrt(vHat) + epsilon);
+					weightptr[j] -= learningRate * mHat / (sqrtf(vHat) + epsilon);
 				}
-				m_firstMomentBias[i] = beta1 * m_firstMomentBias[i] + (1 - beta1) * m_biasGradients[i];
-				m_secondMomentBias[i] = beta2 * m_secondMomentBias[i] + (1 - beta2) * m_biasGradients[i] * m_biasGradients[i];
+				m_firstMomentBias[i] = beta1 * m_firstMomentBias[i] + oneMbeta1 * m_biasGradients[i];
+				m_secondMomentBias[i] = beta2 * m_secondMomentBias[i] + oneMbeta2 * m_biasGradients[i] * m_biasGradients[i];
 
-				float mHat = m_firstMomentBias[i] / (1.0f - pow(beta1, m_timeStep));
-				float vHat = m_secondMomentBias[i] / (1.0f - pow(beta2, m_timeStep));
+				float mHat = m_firstMomentBias[i] / beta1Correction;
+				float vHat = m_secondMomentBias[i] / beta2Correction;
 
-				m_biases[i] -= learningRate * mHat / (sqrt(vHat) + epsilon);
+				m_biases[i] -= learningRate * mHat / (sqrtf(vHat) + epsilon);
 			}
 			m_weightGradients.clear();
 			m_biasGradients.assign(m_neuronCount, 0.0f);
@@ -259,7 +270,6 @@ namespace MiniNeuron {
 
 		}
 
-		
 	}
 
 }

@@ -122,7 +122,7 @@ int main() {
 
     float learningRate = 0.001f;
 
-    net.setOptimizer(OptimizerType::SGD);
+    net.setOptimizer(OptimizerType::Adam);
 
     //train function, 1 epoch.
     net.train(training.inputs, training.targets, 32, 3, learningRate, LossTypes::crossEntropy);
