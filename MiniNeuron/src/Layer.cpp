@@ -122,6 +122,20 @@ namespace MiniNeuron {
 			}
 			break;
 		}
+		case ActivationType::Tanh:
+		{
+			for (int i = 0; i < m_neuronCount; i++) {
+				m_result[i] = std::tanhf(m_zResult[i]);
+			}
+			break;
+		}
+		case ActivationType::LeakyReLU:
+		{
+			for (int i = 0; i < m_neuronCount; i++) {
+				m_result[i] = m_zResult[i] > 0.0f ? m_zResult[i] : 0.01f * m_zResult[i];
+			}
+			break;
+		}
 		default:
 			//default to linear
 			break;
@@ -145,6 +159,15 @@ namespace MiniNeuron {
 		{
 			float s = 1.0f / (1.0f + std::expf(-val));
 			return s * (1.0f - s);
+		}
+		case ActivationType::Tanh:
+		{
+			float t = std::tanhf(val);
+			return 1.0f - t * t;
+		}
+		case ActivationType::LeakyReLU:
+		{
+			return val > 0.0f ? 1.0f : 0.01f;
 		}
 		default:
 			return 1.0f; // linear
