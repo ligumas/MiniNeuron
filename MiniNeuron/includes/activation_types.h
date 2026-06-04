@@ -4,5 +4,7 @@ enum class ActivationType {
 	Linear,
 	ReLU,
 	Sigmoid,
-	Softmax
+	Softmax,
+	Tanh,
+	LeakyReLU
 };
