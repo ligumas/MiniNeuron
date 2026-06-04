@@ -59,6 +59,6 @@ net.saveModel("xor-model.mn");
 - [ ] Batch training
 - [x] Multi-core support
 - [ ] CUDA support
-- [ ] More activations (Tanh, Leaky ReLU)
+- [x] More activations (Tanh, Leaky ReLU)
 - [ ] Unit tests
 - [ ] Full documentation
