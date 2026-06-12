@@ -49,7 +49,6 @@ namespace MiniNeuron {
 			break;
 		}
 		}
-		std::cout << "weights initialized" << std::endl; // debug print
 	}
 
 	void Layer::initOptimizer(OptimizerType op) {
@@ -70,7 +69,7 @@ namespace MiniNeuron {
 	const std::vector<float>& Layer::Forward(const std::vector<float>& input) {
 		const float* __restrict inPtr = input.data();
 
-		if (m_weights.cols != input.size()) {
+		if (m_weights.cols != (int)input.size()) {
 			std::cout << "Invalid input in matrix multiplication " << std::endl;
 			throw std::invalid_argument("...");
 		}
@@ -104,7 +103,7 @@ namespace MiniNeuron {
 			}
 			float sum = 0.0f;
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::expf(m_zResult[i] - max_val);
+				m_result[i] = std::exp(m_zResult[i] - max_val);
 				sum += m_result[i];
 			}
 			if (sum == 0.0f) {
@@ -118,14 +117,14 @@ namespace MiniNeuron {
 		case ActivationType::Sigmoid:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = 1.0f / (1.0f + std::expf(-m_zResult[i]));
+				m_result[i] = 1.0f / (1.0f + std::exp(-m_zResult[i]));
 			}
 			break;
 		}
 		case ActivationType::Tanh:
 		{
 			for (int i = 0; i < m_neuronCount; i++) {
-				m_result[i] = std::tanhf(m_zResult[i]);
+				m_result[i] = std::tanh(m_zResult[i]);
 			}
 			break;
 		}
@@ -157,12 +156,12 @@ namespace MiniNeuron {
 		}
 		case ActivationType::Sigmoid:
 		{
-			float s = 1.0f / (1.0f + std::expf(-val));
+			float s = 1.0f / (1.0f + std::exp(-val));
 			return s * (1.0f - s);
 		}
 		case ActivationType::Tanh:
 		{
-			float t = std::tanhf(val);
+			float t = std::tanh(val);
 			return 1.0f - t * t;
 		}
 		case ActivationType::LeakyReLU:
