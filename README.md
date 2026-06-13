@@ -2,7 +2,7 @@
 
 # MiniNeuron
 
-Small neural network library written from scratch in c++
+Small neural network library written from scratch in C++
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B-blue)
 ![Version](https://img.shields.io/badge/version-1.1.0-orange)
@@ -11,31 +11,29 @@ Small neural network library written from scratch in c++
 
 ## Features
 - Dense (fully connected) layers
-- Activations: Sigmoid, ReLU, Softmax
+- Activations: Sigmoid, ReLU, Tanh, LeakyReLU, Softmax, Linear
 - Loss functions: MSE, Cross Entropy
+- Optimizers: SGD, Adam
 - Initializers: Xavier, He
-- Simple training API
-  
-**NEW in 1.1.0**
-- Multi threading using OpenMP
+- Multi-threading via OpenMP
 - Model save/load
 
 ## Quick example for XOR
 ```cpp
 MiniNeuron::Network net;
 
-//structure of layers 2 -> 4 -> 1
+// structure: 2 -> 4 -> 1
 net.add(MiniNeuron::Layer(4, 2, ActivationType::Sigmoid, InitializerType::Xavier));
 net.add(MiniNeuron::Layer(1, 4, ActivationType::Sigmoid, InitializerType::Xavier));
 
 net.initLayers();
 
-//inputs and tafets are std::vector<std::vector<float>>
-net.train(inputs, targets, 500, 5.0f, LossTypes::crossEntropy);
+// inputs and targets are std::vector<std::vector<float>>
+net.train(inputs, targets, 1, 500, 5.0f, LossTypes::crossEntropy);
 
 std::vector<float> prediction = net.forward(input);
 
-//save the model to a .mn file
+// save the model to a .mn file
 net.saveModel("xor-model.mn");
 ```
 
@@ -57,8 +55,6 @@ net.saveModel("xor-model.mn");
 
 ## Roadmap
 - [ ] Batch training
-- [x] Multi-core support
 - [ ] CUDA support
-- [x] More activations (Tanh, Leaky ReLU)
 - [ ] Unit tests
 - [ ] Full documentation
