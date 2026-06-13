@@ -11,13 +11,10 @@
 
 namespace MiniNeuron {
 
-	//add layer to the back of the network. also prints a debug text.
 	void Network::add(Layer&& x) {
 		layers.push_back(std::move(x));
-		//std::cout << "added layer to network" << std::endl;
 	}
 
-	//initialize layers
 	void Network::initLayers() {
 		for (size_t i = 0; i < layers.size(); i++) {
 			layers[i].initLayer();
@@ -30,14 +27,13 @@ namespace MiniNeuron {
 		}
 	}
 
-	//prints all layers and shows thier neuron count. used for debug, to be changed.
+	//prints all layers and shows their neuron count
 	void Network::printNetwork() {
 		for (size_t i = 0; i < layers.size(); i++) {
 			std::cout << "Layer(" << i << ")" << " neurons(" << layers[i].getNeuronCount() << ")" << std::endl;
 		}
 	}
 
-	//used to predict/use the neural network
 	std::vector<float> Network::forward(const std::vector<float>& inputs) {
 		std::vector<float> x = inputs;
 		for (size_t i = 0; i < layers.size(); i++) {
@@ -46,7 +42,7 @@ namespace MiniNeuron {
 		return x;
 	}
 
-	//score the overall network perfomance, used to tell user how good the network is.
+	//scores the overall network performance
 	float Network::loss(const std::vector<float>& p, const std::vector<float>& y, LossTypes lossType) {
 		float loss = 0.0f;
 		for (size_t i = 0; i < p.size(); i++) {
@@ -71,7 +67,6 @@ namespace MiniNeuron {
 		return loss;
 	}
 
-	//score the neural network
 	float Network::lossDerivative(float p, float y, LossTypes lossType) {
 		switch (lossType) {
 			case LossTypes::MSE:
@@ -89,7 +84,7 @@ namespace MiniNeuron {
 
 	void Network::backpropagate(const std::vector<float>& targets, const std::vector<float>& inputs) {
 		for (int i = (int)layers.size() - 1; i >= 0; i--) {
-			bool isOutput = (i == layers.size() - 1);
+			bool isOutput = ((size_t)i == layers.size() - 1);
 
 			if (isOutput) {
 				Matrix empty(0, 0);
@@ -117,7 +112,7 @@ namespace MiniNeuron {
 			const std::vector<float>& y = targets[i];
 
 			std::vector<float> prediction = forward(x);
-			total_loss += loss(prediction, y, LossTypes::crossEntropy);
+			total_loss += loss(prediction, y, losstype);
 			backpropagate(y, x);
 			if ((i + 1) % batchSize == 0) {
 				updateNetwork(batchSize, learningRate);
@@ -153,8 +148,8 @@ namespace MiniNeuron {
 
 		if (fout) {
 			fout.write(reinterpret_cast<char*>(&numLayers), sizeof(unsigned short));
-			
-			for (size_t l= 0; l< layers.size(); l++) {
+
+			for (size_t l = 0; l < layers.size(); l++) {
 				unsigned short neuronCount = (unsigned short)layers[l].getNeuronCount();
 				unsigned short inputCount = (unsigned short)layers[l].getInputCount();
 				fout.write(reinterpret_cast<char*>(&neuronCount), sizeof(unsigned short));
@@ -163,10 +158,8 @@ namespace MiniNeuron {
 				int init = (int)layers[l].getInitializer();
 				fout.write(reinterpret_cast<char*>(&act), sizeof(int));
 				fout.write(reinterpret_cast<char*>(&init), sizeof(int));
-				for (size_t i = 0; i < layers[l].getNeuronCount(); i++) {
-					fout.write(reinterpret_cast<const char*>(layers[l].getWeights().data.data()),
-						layers[l].getWeights().data.size() * sizeof(float));
-				}
+				fout.write(reinterpret_cast<const char*>(layers[l].getWeights().data.data()),
+					layers[l].getWeights().data.size() * sizeof(float));
 				fout.write(reinterpret_cast<const char*>(layers[l].getBiases().data()), layers[l].getNeuronCount() * sizeof(float));
 			}
 			fout.close();
@@ -205,10 +198,8 @@ namespace MiniNeuron {
 
 				Layer tempLayer(neuronCount, inputCount, act, init);
 
-				Matrix weights(inputCount, neuronCount );
-				for (size_t i = 0; i < neuronCount; i++) {
-					fin.read(reinterpret_cast<char*>(weights.data.data()), weights.data.size() * sizeof(float));
-				}
+				Matrix weights(neuronCount, inputCount);
+				fin.read(reinterpret_cast<char*>(weights.data.data()), weights.data.size() * sizeof(float));
 
 				tempLayer.initSizes();
 
@@ -224,9 +215,6 @@ namespace MiniNeuron {
 			fin.close();
 
 			std::cout << "Model loaded" << std::endl;
-		}
-		else {
-
 		}
 	}
 
