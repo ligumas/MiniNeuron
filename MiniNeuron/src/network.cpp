@@ -88,7 +88,8 @@ namespace MiniNeuron {
 
 			if (isOutput) {
 				Matrix empty(0, 0);
-				layers[i].backpropagation(targets, empty, layers[i - 1].getResult(), true);
+				const std::vector<float>& layerInput = (i > 0) ? layers[i - 1].getResult() : inputs;
+				layers[i].backpropagation(targets, empty, layerInput, true);
 			} else if (i == 0) {
 				layers[i].backpropagation(layers[i + 1].getDelta(), layers[i + 1].getWeights(), inputs, false);
 			} else {
@@ -126,7 +127,7 @@ namespace MiniNeuron {
 		start = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < epochs; i++) {
 			float avgLoss = epoch(inputs, targets, batchSize, learningRate, losstype);
-			if (i % 1 == 0) {
+			if ((i + 1) % 10 == 0 || i == epochs - 1) {
 				std::cout.precision(8);
 				std::cout << std::fixed;
 				std::cout << "Epoch: " << i
